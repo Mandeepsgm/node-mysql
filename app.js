@@ -3,6 +3,7 @@ const mysql = require("mysql");
 const dotenv = require("dotenv");
 const path = require('path');
 
+
 dotenv.config({ path: './.env' });
 
 const app = express();
@@ -16,7 +17,10 @@ const db = mysql.createConnection({
 
 const publicDirectory = path.join(__dirname, './public');
 app.use(express.static(publicDirectory));
+// Parse URL-ecoded bodies sent by the html forms
+app.use(express.urlencoded({ extended: false }));
 
+app.use(express.json());
 
 app.set('view engine', 'hbs');
 
@@ -28,10 +32,9 @@ db.connect((error) => {
     }
 });
 
-app.get("/", (req, res) => {
-    //res.send("<h1> Home Page</h1>")
-    res.render("index");
-});
+// Defining routes
+app.use('/', require('./routes/pages'));
+app.use('/auth', require('./routes/auth'));
 
 app.listen(5000, () => {
     console.log("Server started on port 5000");
