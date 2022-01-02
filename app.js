@@ -2,6 +2,7 @@ const express = require("express");
 const mysql = require("mysql");
 const dotenv = require("dotenv");
 const path = require('path');
+const router = require("./routes/pages");
 
 dotenv.config({ path: './.env' });
 
@@ -28,13 +29,8 @@ db.connect((error) => {
     }
 });
 
-app.get("/", (req, res) => {
-    //res.send("<h1> Home Page</h1>")
-    res.render("index");
-});
-app.get("/register", (req, res) => {
-    res.render("register");
-});
+// Defining routes
+app.use('/', require('./routes/pages'));
 
 app.listen(5000, () => {
     console.log("Server started on port 5000");
