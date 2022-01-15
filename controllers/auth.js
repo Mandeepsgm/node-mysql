@@ -66,7 +66,7 @@ exports.login = async(req, res) => {
         if (!email || !password) {
             return res.status(400).render('login', { message: 'Please enter email and password' });
         }
-        db.query('SELECT email, password FROM users WHERE email = ?', [email], async(error, results) => {
+        db.query('SELECT * FROM users WHERE email = ?', [email], async(error, results) => {
             if (error) {
                 console.log(error);
             }
@@ -75,8 +75,21 @@ exports.login = async(req, res) => {
                 console.log(results[0].password);
                 if (await bcrypt.compare(password, results[0].password)) {
                     console.log('Login OHK');
+                    const id = results[0].id;
+
+                    const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+
+                    const cookieOptions = {
+                        expires: new Date(
+                            Date.now() + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000
+                        ),
+                        httpOnly: true
+                    }
+
+                    res.cookie('jwt', token, cookieOptions);
+                    res.status(200).redirect('/');
                     return res.render('index');
-                } else if (results['password'] !== hashedPassword) {
+                } else {
                     return res.render('login', {
                         message: 'Invalid Credentials'
                     });
