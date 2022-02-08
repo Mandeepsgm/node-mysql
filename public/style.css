@@ -33,3 +33,13 @@ nav li a:hover {
     border: 1px solid rgba(0, 0, 0, 0.25);
     text-shadow: rgb(53, 53, 53) 0 -1px 0, rgb(255 255 255 / 30%) 0 0 10px;
 }
+
+.avatar-ctn {
+    background-color: darkorange;
+    text-align: center;
+}
+
+.avatar {
+    width: 65%;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}

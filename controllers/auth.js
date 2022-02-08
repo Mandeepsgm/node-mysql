@@ -90,7 +90,7 @@ exports.login = async(req, res) => {
                     res.status(200).redirect('/');
                     return res.render('index');
                 } else {
-                    return res.render('login', {
+                    return res.status(401).render('login', {
                         message: 'Invalid Credentials'
                     });
                 }
