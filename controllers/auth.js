@@ -2,7 +2,7 @@ const mysql = require("mysql");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const async = require("hbs/lib/async");
-
+const { promisify } = require('util');
 
 const db = mysql.createConnection({
     host: process.env.DATABASE_HOST,
@@ -107,4 +107,41 @@ exports.login = async(req, res) => {
             message: 'Something went wrong'
         });
     }
+}
+
+
+exports.isLoggedIn = async(req, res, next) => {
+    console.log(req.cookies);
+    if (req.cookies.jwt) {
+        try {
+            const decoded = await promisify(jwt.verify)(req.cookies.jwt,
+                process.env.JWT_SECRET);
+
+            console.log(decoded);
+
+            // check the 
+            db.query('SELECT * FROM users WHERE id = ?', [decoded.id], (error, result) => {
+                console.log(result);
+                if (!result) {
+                    return next();
+                }
+                req.user = result[0];
+                return next();
+            });
+        } catch (error) {
+            console.log(error);
+            return next();
+        }
+    } else {
+        next();
+    }
+}
+
+exports.logout = async(req, res, next) => {
+    res.cookie('jwt', 'logout', {
+        expires: new Date(Date.now() + 2 * 1000),
+        httpOnly: true
+    });
+
+    res.status(200).redirect('/');
 }
